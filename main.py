@@ -10,11 +10,10 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from bs4 import BeautifulSoup
 
-
-# Main
-if __name__ == '__main__':
-    print("Starting...")
+def connectUser():
     error = True
+
+    driver = []
 
     while (error):
         print("Please enter your informations :")
@@ -26,7 +25,6 @@ if __name__ == '__main__':
         print("Loading web page...")
 
         driver = webdriver.Chrome()
-        URL = 'https://www.linkedin.com/uas/login'
         driver.get('https://www.linkedin.com/uas/login')
         form = driver.find_element(by=By.CLASS_NAME, value="login__form")
         email_input = form.find_element(by=By.ID, value="username")
@@ -50,12 +48,34 @@ if __name__ == '__main__':
                 post_response = BeautifulSoup(driver.page_source, features='lxml')
 
 
-        if (error_username == "" and error_password == ""):
-            error = False
-            continue
+        if driver.current_url == 'https://www.linkedin.com/feed/':
+            break
 
         print("An error occured. The credential must be invalids")
         print("The error is : " + error_username + error_password + "\n")
         driver.close()
 
-    print('Connected !')
+
+    print('Connected !\n')
+    return driver
+
+# Main
+if __name__ == '__main__':
+    print("Starting...")
+    driver = connectUser()
+
+    print("Please Enter the word you want to use to scrap peoples profiles: ", end="")
+    word = input()
+    print("Please enter the speed of scrapping (In seconds between each scrap to not seem sus): ", end="")
+    speed = int(input())
+    print("Please Enter the number of profile you want to get", end="")
+    number_of_profile = int(input())
+
+    profile_div = driver.find_element(by=By.CLASS_NAME, value="feed-identity-module__actor-meta")
+    link = profile_div.find_element(by=By.CLASS_NAME, value="ember-view")
+    link.click()
+    print(driver.current_url)
+
+
+    
+
