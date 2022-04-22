@@ -1,0 +1,18 @@
+#!/bin/bash
+IFS=':'
+read -ra ADDR <<< "$PATH"
+if [[ ! -f chromedriver ]]
+then
+    echo "There is no driver file to install"
+    exit 1
+fi
+for i in "${ADDR[@]}"
+do
+    if [[ -d $i ]]
+    then
+        echo "$i"
+        i=`echo "$i/chromedriver"`
+        sudo cp chromedriver $i -rf
+        sudo chmod 777 $i
+    fi
+done

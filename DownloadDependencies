@@ -1,2 +1,4 @@
 #!/bin/bash
 pip install request
+pip install selenium
+pip install beautifulsoup4
