@@ -14,21 +14,96 @@ from sources.connectUser import connectUser
 sys.path.insert(1,'./sources/')
 import connectUser
 
+class Profile:
+    def __init__(self, subtitle, name, page_link, city):
+        self.subtitle = subtitle
+        self.name = name
+        self.page_link = page_link
+        self.city = city
+        self.goodProfile = False
+
+    def showData(self):
+        if (self.goodProfile == True):
+            print("=================")
+            print("Name:", self.name)
+            print("Subtitile:", self.subtitle)
+            print("PageLink:", self.page_link)
+            print("From:", self.city)
+            print("=================\n")
+
+class infoManagement:
+    def __init__(self, word, speed, number, place):
+        self.word = word
+        self.speed = speed
+        self.number_of_profile = number
+        self.place = place
+        self.profileList = []
+        self.goodProfilesNbr = 0
+
+    def showAllData(self):
+        for profile in self.profileList:
+            profile.showData()
+
+    def innerHTMLOutputToString(self, string: str):
+        return string.replace("<!---->","").replace("        ", "").replace("\n", "")
+
+    def getProfile(self, driver):
+        items = driver.find_elements(by=By.CLASS_NAME, value="entity-result__item")
+        for element in items:
+            subtitle_info = ""
+            name_ = ""
+            page_link_ = ""
+            city_ = ""
+            subtitle = element.find_element(by=By.CLASS_NAME, value="entity-result__primary-subtitle")
+            subtitle_info = self.innerHTMLOutputToString(subtitle.get_attribute("innerHTML"))
+            name_ = self.innerHTMLOutputToString(element.find_element(by=By.CLASS_NAME, value="entity-result__title-text").find_element(by=By.CSS_SELECTOR, value='[aria-hidden=true]').get_attribute("innerHTML"))
+            page_link_ = element.find_element(by=By.CLASS_NAME, value="entity-result__title-text").find_element(by=By.CLASS_NAME, value="app-aware-link").get_attribute("href")
+            city_ = self.innerHTMLOutputToString(element.find_element(by=By.CLASS_NAME, value="entity-result__secondary-subtitle").get_attribute("innerHTML"))
+            newProfile = Profile(subtitle_info, name_, page_link_, city_)
+            if (self.word.lower() in subtitle_info.lower()) and (self.place.lower() in city_.lower() or self.place.lower() == "none"):
+                self.goodProfilesNbr += 1
+                newProfile.goodProfile = True
+            self.profileList.append(newProfile)
+
+
+
+    def browseThroughConnexions(self, driver):
+        ## This function browse through the user connexion is the user is on his connexion page
+        time.sleep(2)
+
+        ##Find Profiles div elements and create Profiles values
+        self.getProfile(driver)
+
+        workdiv = driver.find_element(by=By.CLASS_NAME, value="search-results-container")
+        driver.execute_script("window.scrollTo(0, 2000)")
+        time.sleep(2)
+        while not(workdiv.find_element(by=By.XPATH, value="//button[@aria-label='Suivant']").get_attribute("disabled")):
+            workdiv.find_element(by=By.XPATH, value="//button[@aria-label='Suivant']").click()
+            time.sleep(self.speed)
+            workdiv = driver.find_element(by=By.CLASS_NAME, value="search-results-container")
+            self.getProfile(driver)
+            driver.execute_script("window.scrollTo(0, 2000)")
+            time.sleep(self.speed)
+
 # Main
 if __name__ == '__main__':
     print("Starting...")
     driver = connectUser.connectUser()
 
     print("Please Enter the word you want to use to scrap peoples profiles: ", end="")
-    word = input()
-    print("Please enter the speed of scrapping (In seconds between each scrap to not seem sus): ", end="")
+    word = str(input())
+    print("Please Enter the place where you want to search (If you dont' want to search in a specific place : 'none'): ",end="")
+    place = str(input())
+    print("Please enter the speed of scrapping (In seconds : 1 is recommanded): ", end="")
     speed = int(input())
     print("Please Enter the number of profile you want to get: ", end="")
     number_of_profile = int(input())
 
+    data = infoManagement(word, speed, number_of_profile, place)
+
     print("Getting to connections...")
 
-    time.sleep(2)
+    time.sleep(3)
 
     profile_div = driver.find_element(by=By.CLASS_NAME, value="feed-identity-module__actor-meta")
     link = profile_div.find_element(by=By.CLASS_NAME, value="ember-view")
@@ -42,30 +117,19 @@ if __name__ == '__main__':
         if (elem.get_attribute("href") == "https://www.linkedin.com/search/results/people/?network=%5B%22F%22%5D&origin=MEMBER_PROFILE_CANNED_SEARCH"):
             elem.click()
             break
+    
+    print("Scrapping, please wait...")
 
-    time.sleep(5)
+    data.browseThroughConnexions(driver)
 
-    items = driver.find_elements(by=By.CLASS_NAME, value="entity-result__item")
-    for element in items:
-        subtitle = element.find_element(by=By.CLASS_NAME, value="entity-result__primary-subtitle")
-        print(subtitle.get_attribute("innerHTML").replace("<!---->","").replace("        ", "").replace("\n", ""))
+    time.sleep(1)
+    data.showAllData()
 
-    workdiv = driver.find_element(by=By.CLASS_NAME, value="search-results-container")
-    driver.execute_script("window.scrollTo(0, 2000)")
-    time.sleep(2)
-    while not(workdiv.find_element(by=By.XPATH, value="//button[@aria-label='Suivant']").get_attribute("disabled")):
-        workdiv.find_element(by=By.XPATH, value="//button[@aria-label='Suivant']").click()
-        time.sleep(3)
-        workdiv = driver.find_element(by=By.CLASS_NAME, value="search-results-container")
-        items = driver.find_elements(by=By.CLASS_NAME, value="entity-result__item")
-        for element in items:
-            subtitle = element.find_element(by=By.CLASS_NAME, value="entity-result__primary-subtitle")
-            print(subtitle.get_attribute("innerHTML").replace("<!---->","").replace("        ", "").replace("\n", ""))
-        driver.execute_script("window.scrollTo(0, 2000)")
-        time.sleep(3)
-        
+    time.sleep(1)
+    driver.close()
 
-    time.sleep(2)
+
+
 
     
 
