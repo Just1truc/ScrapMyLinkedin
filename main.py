@@ -39,6 +39,7 @@ class infoManagement:
         self.place = place
         self.profileList = []
         self.goodProfilesNbr = 0
+        self.openlist = [] #list of links to profiles pages
 
     def showAllData(self):
         for profile in self.profileList:
@@ -64,7 +65,7 @@ class infoManagement:
                 self.goodProfilesNbr += 1
                 newProfile.goodProfile = True
             self.profileList.append(newProfile)
-
+            self.openlist.append(page_link_)
 
 
     def browseThroughConnexions(self, driver):
@@ -77,7 +78,7 @@ class infoManagement:
         workdiv = driver.find_element(by=By.CLASS_NAME, value="search-results-container")
         driver.execute_script("window.scrollTo(0, 2000)")
         time.sleep(2)
-        while not(workdiv.find_element(by=By.XPATH, value="//button[@aria-label='Suivant']").get_attribute("disabled")):
+        while not(workdiv.find_element(by=By.XPATH, value="//button[@aria-label='Suivant']").get_attribute("disabled")) and self.goodProfilesNbr < self.number_of_profile:
             workdiv.find_element(by=By.XPATH, value="//button[@aria-label='Suivant']").click()
             time.sleep(self.speed)
             workdiv = driver.find_element(by=By.CLASS_NAME, value="search-results-container")
@@ -121,6 +122,17 @@ if __name__ == '__main__':
     print("Scrapping, please wait...")
 
     data.browseThroughConnexions(driver)
+
+    time.sleep(1)
+
+    while (data.goodProfilesNbr < number_of_profile):
+        driver.get(data.openlist[0])
+        time.sleep(3)
+        driver.find_element(by=By.XPATH, value="/html/body/div[6]/div[3]/div/div/div[2]/div/div/main/section[1]/div[2]/ul/li/a").click()
+        time.sleep(2)
+        data.openlist.pop(0)
+        data.browseThroughConnexions(driver)
+        time.sleep(1)
 
     time.sleep(1)
     data.showAllData()
