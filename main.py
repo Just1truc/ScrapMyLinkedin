@@ -95,7 +95,7 @@ if __name__ == '__main__':
     word = str(input())
     print("Please Enter the place where you want to search (If you dont' want to search in a specific place : 'none'): ",end="")
     place = str(input())
-    print("Please enter the speed of scrapping (In seconds : 1 is recommanded): ", end="")
+    print("Please enter the speed of scrapping (In seconds : 2 is recommanded): ", end="")
     speed = int(input())
     print("Please Enter the number of profile you want to get: ", end="")
     number_of_profile = int(input())

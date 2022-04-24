@@ -1,4 +1,5 @@
 #!/bin/bash
-pip install request
+pip install python-time
+pip install requests
 pip install selenium
 pip install beautifulsoup4
