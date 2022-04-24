@@ -79,6 +79,8 @@ You can do something else meanwhile.
 It is possible for you to encounter some problems.
 It can be caused by a **bad connection** or the fact that the window has been **minimized** or **closed**.
 
+Also, it'll happen if you are not **prenium** on linkedIn.The program will crash because the account reached the maximum profil search per month.
+
 ## Credits
 
 #### Programation : Justin Duc
