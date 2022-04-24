@@ -14,6 +14,27 @@ from sources.connectUser import connectUser
 sys.path.insert(1,'./sources/')
 import connectUser
 
+def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', printEnd = "\r"):
+    """
+    Call in a loop to create terminal progress bar
+    @params:
+        iteration   - Required  : current iteration (Int)
+        total       - Required  : total iterations (Int)
+        prefix      - Optional  : prefix string (Str)
+        suffix      - Optional  : suffix string (Str)
+        decimals    - Optional  : positive number of decimals in percent complete (Int)
+        length      - Optional  : character length of bar (Int)
+        fill        - Optional  : bar fill character (Str)
+        printEnd    - Optional  : end character (e.g. "\r", "\r\n") (Str)
+    """
+    percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
+    filledLength = int(length * iteration // total)
+    bar = fill * filledLength + '-' * (length - filledLength)
+    print(f'\r{prefix} |{bar}| {percent}% {suffix}', end = printEnd)
+    # Print New Line on Complete
+    if iteration == total: 
+        print()
+
 class Profile:
     def __init__(self, subtitle, name, page_link, city):
         self.subtitle = subtitle
@@ -63,6 +84,7 @@ class infoManagement:
             newProfile = Profile(subtitle_info, name_, page_link_, city_)
             if (self.word.lower() in subtitle_info.lower()) and (self.place.lower() in city_.lower() or self.place.lower() == "none"):
                 self.goodProfilesNbr += 1
+                printProgressBar(self.goodProfilesNbr, self.number_of_profile, prefix = 'Progress:', suffix = 'Complete', length = 50)
                 newProfile.goodProfile = True
             self.profileList.append(newProfile)
             self.openlist.append(page_link_)
@@ -78,13 +100,17 @@ class infoManagement:
         workdiv = driver.find_element(by=By.CLASS_NAME, value="search-results-container")
         driver.execute_script("window.scrollTo(0, 2000)")
         time.sleep(2)
-        while not(workdiv.find_element(by=By.XPATH, value="//button[@aria-label='Suivant']").get_attribute("disabled")) and self.goodProfilesNbr < self.number_of_profile:
-            workdiv.find_element(by=By.XPATH, value="//button[@aria-label='Suivant']").click()
-            time.sleep(self.speed)
-            workdiv = driver.find_element(by=By.CLASS_NAME, value="search-results-container")
-            self.getProfile(driver)
-            driver.execute_script("window.scrollTo(0, 2000)")
-            time.sleep(self.speed)
+        try:
+            while not(workdiv.find_element(by=By.XPATH, value="//button[@aria-label='Suivant']").get_attribute("disabled")) and self.goodProfilesNbr < self.number_of_profile:
+                workdiv.find_element(by=By.XPATH, value="//button[@aria-label='Suivant']").click()
+                time.sleep(self.speed)
+                workdiv = driver.find_element(by=By.CLASS_NAME, value="search-results-container")
+                self.getProfile(driver)
+                driver.execute_script("window.scrollTo(0, 2000)")
+                time.sleep(self.speed)
+        except:
+            print("The account has reached the maximum profile research per month.")
+            exit(1)
 
 # Main
 if __name__ == '__main__':
@@ -120,6 +146,8 @@ if __name__ == '__main__':
             break
 
     print("Scrapping, please wait...")
+
+    printProgressBar(0, number_of_profile, prefix = 'Progress:', suffix = 'Complete', length = 50)
 
     data.browseThroughConnexions(driver)
 
