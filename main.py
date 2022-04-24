@@ -110,15 +110,15 @@ if __name__ == '__main__':
     link = profile_div.find_element(by=By.CLASS_NAME, value="ember-view")
     link.click()
 
-    time.sleep(2)
+    time.sleep(3)
 
     profile_div = driver.find_element(by=By.CLASS_NAME, value="ph5")
     links = profile_div.find_elements(by=By.TAG_NAME, value="a")
     for elem in links:
-        if (elem.get_attribute("href") == "https://www.linkedin.com/search/results/people/?network=%5B%22F%22%5D&origin=MEMBER_PROFILE_CANNED_SEARCH"):
+        if ("MEMBER_PROFILE_CANNED_SEARCH" in elem.get_attribute("href")):
             elem.click()
             break
-    
+
     print("Scrapping, please wait...")
 
     data.browseThroughConnexions(driver)
@@ -128,7 +128,12 @@ if __name__ == '__main__':
     while (data.goodProfilesNbr < number_of_profile):
         driver.get(data.openlist[0])
         time.sleep(3)
-        driver.find_element(by=By.XPATH, value="/html/body/div[6]/div[3]/div/div/div[2]/div/div/main/section[1]/div[2]/ul/li/a").click()
+        profile_div = driver.find_element(by=By.CLASS_NAME, value="ph5")
+        links = profile_div.find_elements(by=By.TAG_NAME, value="a")
+        for elem in links:
+            if ("MEMBER_PROFILE_CANNED_SEARCH" in elem.get_attribute("href")):
+                elem.click()
+                break
         time.sleep(2)
         data.openlist.pop(0)
         data.browseThroughConnexions(driver)
