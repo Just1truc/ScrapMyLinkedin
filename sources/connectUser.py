@@ -1,7 +1,9 @@
 import re
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
+import os
 import json
 import time
 
@@ -18,6 +20,11 @@ def connectUser():
 
     driver = []
     i = 0
+
+    options = webdriver.ChromeOptions()
+    options.add_experimental_option("excludeSwitches",["ignore-certificate-errors"])
+    options.add_argument('--disable-gpu')
+    options.add_argument('--headless')
 
     while (error):
         print("Please enter your informations :")
@@ -36,7 +43,7 @@ def connectUser():
 
         print("Loading web page...")
 
-        driver = webdriver.Chrome()
+        driver = webdriver.Chrome(executable_path=os.path.abspath("chromedriver"),   chrome_options=options)
         driver.get('https://www.linkedin.com/uas/login')
         form = driver.find_element(by=By.CLASS_NAME, value="login__form")
         email_input = form.find_element(by=By.ID, value="username")
