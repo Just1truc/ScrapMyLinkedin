@@ -61,6 +61,7 @@ class infoManagement:
         self.profileList = []
         self.goodProfilesNbr = 0
         self.openlist = [] #list of links to profiles pages
+        self.already_visited = [] #listy of already visited pages
 
     def showAllData(self):
         for profile in self.profileList:
@@ -72,6 +73,8 @@ class infoManagement:
     def getProfile(self, driver):
         items = driver.find_elements(by=By.CLASS_NAME, value="entity-result__item")
         for element in items:
+            if (element.find_element(by=By.CLASS_NAME, value="entity-result__title-text").find_element(by=By.CLASS_NAME, value="app-aware-link").get_attribute("href") in self.already_visited):
+                continue
             subtitle_info = ""
             name_ = ""
             page_link_ = ""
@@ -153,7 +156,7 @@ if __name__ == '__main__':
 
     time.sleep(1)
 
-    while (data.goodProfilesNbr < number_of_profile):
+    while (data.goodProfilesNbr < data.number_of_profile):
         driver.get(data.openlist[0])
         time.sleep(3)
         profile_div = driver.find_element(by=By.CLASS_NAME, value="ph5")
@@ -163,6 +166,7 @@ if __name__ == '__main__':
                 elem.click()
                 break
         time.sleep(2)
+        data.already_visited.append(data.openlist[0])
         data.openlist.pop(0)
         data.browseThroughConnexions(driver)
         time.sleep(1)
