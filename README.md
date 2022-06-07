@@ -29,7 +29,7 @@ Supported OS are:
 |OS| Supported ? |
 |--|------------|
 |Fedora|   ✅ |
-|Ubuntu based|✅|
+|Debian based|✅|
 |Windows |⚠️ (WSL Advised)|
 
 ## Installation
